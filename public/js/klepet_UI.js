@@ -1,10 +1,33 @@
 function divElementEnostavniTekst(sporocilo) {
   var jeSmesko = sporocilo.indexOf('http://sandbox.lavbic.net/teaching/OIS/gradivo/') > -1;
-  if (jeSmesko) {
-    sporocilo = sporocilo.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace('&lt;img', '<img').replace('png\' /&gt;', 'png\' />');
+  var jeYoutube = sporocilo.indexOf('https://www.youtube.com/watch?v=') > -1;
+  if (jeSmesko || jeYoutube) {
+    sporocilo = sporocilo
+    .replace(/\</g, '&lt;')
+    .replace(/\>/g, '&gt;')
+    .replace('&lt;img', '<img')
+    .replace('png\' /&gt;', 'png\' />');
     return $('<div style="font-weight: bold"></div>').html(sporocilo);
   } else {
     return $('<div style="font-weight: bold;"></div>').text(sporocilo);
+  }
+}
+
+function youtubeToIframe(video) {
+  return '<iframe style="width:200px; height:150px; margin-left:20px" src="https://www.youtube.com/embed/'+video+'" allowfullscreen></iframe>';
+}
+
+function vrniVidejeIzSporocila(sporocilo) {
+  var table = sporocilo.match(/(?:(?:http|https):\/\/www\.youtube\.com\/watch\?v=)(.{11})/gi);
+  for(var i in table) {
+    table[i] = table[i].replace(/(?:(?:http|https):\/\/www\.youtube\.com\/watch\?v=)(.{11})/gi, '$1');
+  }
+  return table;
+}
+
+function pripniVideje(table) {
+  for(var i in table) {
+    $('#sporocila').append(youtubeToIframe(table[i]));
   }
 }
 
@@ -14,6 +37,7 @@ function divElementHtmlTekst(sporocilo) {
 
 function procesirajVnosUporabnika(klepetApp, socket) {
   var sporocilo = $('#poslji-sporocilo').val();
+  var tableVideo = vrniVidejeIzSporocila(sporocilo);
   sporocilo = dodajSmeske(sporocilo);
   var sistemskoSporocilo;
 
@@ -21,11 +45,13 @@ function procesirajVnosUporabnika(klepetApp, socket) {
     sistemskoSporocilo = klepetApp.procesirajUkaz(sporocilo);
     if (sistemskoSporocilo) {
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
+      pripniVideje(tableVideo);
     }
   } else {
     sporocilo = filtirirajVulgarneBesede(sporocilo);
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
     $('#sporocila').append(divElementEnostavniTekst(sporocilo));
+    pripniVideje(tableVideo);
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
   }
 
@@ -76,6 +102,7 @@ $(document).ready(function() {
   socket.on('sporocilo', function (sporocilo) {
     var novElement = divElementEnostavniTekst(sporocilo.besedilo);
     $('#sporocila').append(novElement);
+    pripniVideje(vrniVidejeIzSporocila(sporocilo.besedilo));
   });
   
   socket.on('kanali', function(kanali) {
