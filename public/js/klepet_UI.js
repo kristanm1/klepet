@@ -1,4 +1,5 @@
 function divElementEnostavniTekst(sporocilo) {
+  //console.log(sporocilo);
   var jeSmesko = sporocilo.indexOf('http://sandbox.lavbic.net/teaching/OIS/gradivo/') > -1;
   if (jeSmesko) {
     sporocilo = sporocilo.replace(/\</g, '&lt;').replace(/\>/g, '&gt;').replace('&lt;img', '<img').replace('png\' /&gt;', 'png\' />');
@@ -54,6 +55,20 @@ function filtirirajVulgarneBesede(vhod) {
 
 $(document).ready(function() {
   var klepetApp = new Klepet(socket);
+  
+  socket.on('dregljaj', function(rezultat) {
+     if(rezultat.dregljaj) {
+       //console.log(rezultat.vzdevek);
+       //console.log(rezultat.besedilo);
+       
+       $('#vsebina').jrumble();
+       $('#vsebina').trigger('startRumble');
+       setTimeout(function() {
+         $('#vsebina').trigger('stopRumble');
+       }, 1500);
+       
+     }
+  });
 
   socket.on('vzdevekSpremembaOdgovor', function(rezultat) {
     var sporocilo;
