@@ -6,7 +6,7 @@ var predpomnilnik = {};
 
 function posredujNapako404(odgovor) {
   odgovor.writeHead(404, {'Content-Type': 'text/plain'});
-  odgovor.write('Napaka 404: Vira ni mogoče najti.');
+  odgovor.write('Napaka 404: Vira ni mogoce najti.');
   odgovor.end();
 }
 
@@ -50,7 +50,7 @@ var streznik = http.createServer(function(zahteva, odgovor) {
   posredujStaticnoVsebino(odgovor, predpomnilnik, absolutnaPotDoDatoteke);
 });
 
-// Za združljivost razvoja na lokalnem računalniku ali v Cloud9 okolju
+// Za združljivost razvoja na lokalnem racunalniku ali v Cloud9 okolju
 if (!process.env.PORT) {
   process.env.PORT = 8080;
 }
@@ -61,3 +61,4 @@ streznik.listen(process.env.PORT, function() {
 
 var klepetalnicaStreznik = require('./lib/klepetalnica_streznik');
 klepetalnicaStreznik.listen(streznik);
+ 

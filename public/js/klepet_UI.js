@@ -1,8 +1,7 @@
 function divElementEnostavniTekst(sporocilo) {
   //console.log(sporocilo);
   var jeSmesko = sporocilo.indexOf('http://sandbox.lavbic.net/teaching/OIS/gradivo/') > -1;
-  var jeYoutube = sporocilo.indexOf('https://www.youtube.com/watch?v=') > -1;
-  if (jeSmesko || jeYoutube) {
+  if (jeSmesko) {
     sporocilo = sporocilo
     .replace(/\</g, '&lt;')
     .replace(/\>/g, '&gt;')
@@ -14,6 +13,12 @@ function divElementEnostavniTekst(sporocilo) {
   } else {
     return $('<div style="font-weight: bold;"></div>').text(sporocilo);
   }
+}
+
+function toBottom(div) {
+   while (div.scrollTop < div.scrollHeight - div.clientHeight) {
+        div.scrollTop += 10; // move down
+   }
 }
 
 function picToImg(link) {
@@ -35,7 +40,7 @@ function vrniLinkeSlikIzSporocila(sporocilo) {
 
 function pripniSlike(slike) {
   for(i in slike) {
-    console.log(i +" "+ slike[i]);
+    //console.log(i +" "+ slike[i]);
     if(!(slike[i].indexOf("http://sandbox.lavbic.net/teaching/OIS/gradivo/") > -1)) {
       $('#sporocila').append(picToImg(vrniLinkeSlikIzSporocila(slike[i])));
     }
@@ -76,15 +81,16 @@ function procesirajVnosUporabnika(klepetApp, socket) {
       $('#sporocila').append(divElementHtmlTekst(sistemskoSporocilo));
       pripniSlike(tableSlik);
       pripniVideje(tableVideo);
+      toBottom($('#sporocila'));
     }
   } else {
     sporocilo = filtirirajVulgarneBesede(BrezSporocilo);
     klepetApp.posljiSporocilo(trenutniKanal, sporocilo);
     $('#sporocila').append(divElementEnostavniTekst(BrezSporocilo));
     pripniSlike(tableSlik);
-    $('#sporocila').append(divElementEnostavniTekst(BrezSporocilo));
     pripniVideje(tableVideo);
     $('#sporocila').scrollTop($('#sporocila').prop('scrollHeight'));
+    toBottom($('#sporocila'));
   }
 
   $('#poslji-sporocilo').val('');
@@ -150,6 +156,7 @@ $(document).ready(function() {
     $('#sporocila').append(novElement);
     pripniSlike(vrniLinkeSlikIzSporocila(sporocilo.besedilo));
     pripniVideje(vrniVidejeIzSporocila(sporocilo.besedilo));
+    toBottom($('#sporocila'));
   });
   
   socket.on('kanali', function(kanali) {
@@ -176,7 +183,7 @@ $(document).ready(function() {
     }
     
     $('#seznam-uporabnikov div').click(function() {
-      $('#poslji-sporocilo').val('/zasebno "' + $(this).html() + '" ').focus;
+      $('#poslji-sporocilo').val('/zasebno "' + $(this).html() + '" ').focus();
     }); 
     
   });

@@ -47,12 +47,12 @@ Klepet.prototype.procesirajUkaz = function(ukaz) {
       //console.log('dregljaj!!');
       //console.log('besede: '+besede);
       //console.log('besedilo: '+besedilo);
-      var user = besede.join("");
-      user = user.split("\"");
-      if(user.length == 3) {
+
+      //console.log(besede.length);
+      if(besede.length == 2) {
         //console.log("user: "+user[1]);
-        this.socket.emit('dregljaj', { vzdevek: user[1], sporocilo: 'drek'});
-        sporocilo = "<b>Dregljaj za " + user[1] + "</b>";
+        this.socket.emit('dregljaj', { vzdevek: besede[1], sporocilo: 'drek'});
+        sporocilo = "<b>Dregljaj za " + besede[1] + "</b>";
       }
       else {
         sporocilo = '<b>Neznan ukaz!!!</b>';
